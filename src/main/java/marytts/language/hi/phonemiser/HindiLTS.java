@@ -434,74 +434,11 @@ public class HindiLTS {
         char dec = (char)intValue;
         return Character.toString(dec);
     }
-
-
-/*    *//**
-     * Schwa handler for telugu
-     * @param lPhoneSym
-     * @param lPhoneTypes
-     * @return
-     *//*
-    private ArrayList<String> schwaHandler(ArrayList<String> lPhoneSym,
-            ArrayList<String> lPhoneTypes) {
-        
-        String prev, next;
-        for(int i=0; i<lPhoneTypes.size(); i++){
-            prev = lPhoneTypes.get(i);
-            if ( (i+1) < lPhoneTypes.size() ) {
-                next = lPhoneTypes.get(i+1);
-            }
-            else {
-                next = lPhoneTypes.get(i);
-            }
-            
-            if ( (prev.equals("CON") && next.equals("CON")) || (prev.equals("CON") && next.equals("SYM")) 
-                    || (prev.equals("CON") && next.equals("#")) ){
-                lPhoneTypes.add(i+1, "VOW");
-                lPhoneSym.add(i+1, "a");
-            }
-        }
-        return lPhoneSym;
-    }
-
-    *//**
-     * Schwa handler for telugu
-     *//*
-    private void schwaHandler() {
-        
-        String prev, next;
-        for(int i=0; i<listPhoneTypes.size(); i++){
-            
-            //if(listPhoneTypes.get(i) == null) continue;
-            //if(listPhoneTypes.get(i+1) == null) ;
-            prev = listPhoneTypes.get(i);
-            
-            if ( (i+1) < listPhoneTypes.size() ) {
-                next = listPhoneTypes.get(i+1);
-            }
-            else {
-                next = listPhoneTypes.get(i);
-            }
-            
-            if ( (prev.equals("CON") && next.equals("CON")) || (prev.equals("CON") && next.equals("SYM")) 
-                    || (prev.equals("CON") && next.equals("#")) ){
-                listPhoneTypes.add(i+1, "VOW");
-                listPhoneSym.add(i+1, "a");
-            }
-            
-        }
-    }*/
-
-    private void schwaHandlerNew() {
-    	
-    	
-    	
-    }
     
     /**
      * Schwa handler 
      */
-    private void schwaHandler() {
+    private void schwaHandlerWorking() {
         
         String prevType, nextType;
         String prevPhone, nextPhone;
@@ -567,7 +504,531 @@ public class HindiLTS {
         }
     }
     
+    
     /**
+     * Schwa handler 
+     */
+    private void RuleSet1() {
+        
+        String prevType, nextType;
+        String prevPhone, nextPhone;
+        String prevUchar, nextUchar;
+        boolean isFinalCharacter = false;
+        
+        for(int i=0; i<listPhoneTypes.size(); i++){
+            
+            //if(listPhoneTypes.get(i) == null) continue;
+            //if(listPhoneTypes.get(i+1) == null) ;
+            prevType  = listPhoneTypes.get(i);
+            prevPhone = this.listPhoneSym.get(i);
+            prevUchar = this.utf8CharList.get(i);
+            
+            if ( (i+1) < listPhoneTypes.size() ) {
+                nextType = listPhoneTypes.get(i+1);
+                nextPhone = this.listPhoneSym.get(i+1);
+                nextUchar = this.utf8CharList.get(i+1);
+            } else {
+                nextType = listPhoneTypes.get(i);
+                nextPhone = this.listPhoneSym.get(i);
+                nextUchar = this.utf8CharList.get(i);
+                isFinalCharacter = true;
+            }
+            
+            // Bindu handling
+            if (prevUchar.equals("0902")) {
+                if (isFinalCharacter == true) {
+                    listPhoneTypes.set(i, "CON");
+                    listPhoneSym.set(i, "ng~");
+                    utf8CharList.set(i, "0919");
+                    listConTypes.set(i, "U");
+                } else if ( this.isBelongs2TAVarga(nextUchar) ) {
+                    listPhoneTypes.set(i, "CON");
+                    listPhoneSym.set(i, "n");
+                    utf8CharList.set(i, "0928");
+                    listConTypes.set(i, "U");
+                } else if ( this.isBelongs2PAVarga(nextUchar) ) {
+                    listPhoneTypes.set(i, "CON");
+                    listPhoneSym.set(i, "m");
+                    utf8CharList.set(i, "092E");
+                    listConTypes.set(i, "U");
+                } else if ( this.isBelongs2KAVarga(nextUchar) ) {
+                    listPhoneTypes.set(i, "CON");
+                    listPhoneSym.set(i, "ng~");
+                    utf8CharList.set(i, "0919");
+                    listConTypes.set(i, "U");
+                }
+            }
+            
+            if (isFinalCharacter == true) {
+                break;
+            }
+            
+            //System.err.println(prevType+" "+prevPhone+" "+prevUchar+" "+nextType+" "+nextPhone+" "+nextUchar);
+                
+            //ruleOne(nextUchar, nextUchar, prevType, nextType, prevPhone, nextPhone, i);
+            
+            if ( (prevType.equals("CON") && nextType.equals("CON")) || (prevType.equals("CON") && nextType.equals("SYM")) ) {
+                listPhoneTypes.add(i+1, "VOW");
+                listPhoneSym.add(i+1, "a");
+                this.utf8CharList.add(i+1,"093D");
+                listConTypes.add(i+1, "#");
+            } else if ( prevType.equals("CON") && isFullVowel(nextUchar) ) {
+                listPhoneTypes.add(i+1, "VOW");
+                listPhoneSym.add(i+1, "a");
+                this.utf8CharList.add(i+1,"093D");
+                listConTypes.add(i+1, "F");
+                listConTypes.set(i, "F");
+            }
+            
+        }
+    }
+    
+    
+    /**
+     * Schwa handler 
+     */
+    private void RuleSetZero() {
+        
+        String prevType, nextType;
+        String prevPhone, nextPhone;
+        String prevUchar, nextUchar;
+        boolean isFinalCharacter = false;
+        
+        for(int i=0; i<listPhoneTypes.size(); i++){
+            
+            //if(listPhoneTypes.get(i) == null) continue;
+            //if(listPhoneTypes.get(i+1) == null) ;
+            prevType  = listPhoneTypes.get(i);
+            prevPhone = this.listPhoneSym.get(i);
+            prevUchar = this.utf8CharList.get(i);
+            
+            if ( (i+1) < listPhoneTypes.size() ) {
+                nextType = listPhoneTypes.get(i+1);
+                nextPhone = this.listPhoneSym.get(i+1);
+                nextUchar = this.utf8CharList.get(i+1);
+            } else {
+                nextType = listPhoneTypes.get(i);
+                nextPhone = this.listPhoneSym.get(i);
+                nextUchar = this.utf8CharList.get(i);
+                isFinalCharacter = true;
+            }
+            
+            // Bindu handling
+            if (prevUchar.equals("0902")) {
+                if (isFinalCharacter == true) {
+                    listPhoneTypes.set(i, "CON");
+                    listPhoneSym.set(i, "ng~");
+                    utf8CharList.set(i, "0919");
+                    listConTypes.set(i, "U");
+                } else if ( this.isBelongs2TAVarga(nextUchar) ) {
+                    listPhoneTypes.set(i, "CON");
+                    listPhoneSym.set(i, "n");
+                    utf8CharList.set(i, "0928");
+                    listConTypes.set(i, "U");
+                } else if ( this.isBelongs2PAVarga(nextUchar) ) {
+                    listPhoneTypes.set(i, "CON");
+                    listPhoneSym.set(i, "m");
+                    utf8CharList.set(i, "092E");
+                    listConTypes.set(i, "U");
+                } else if ( this.isBelongs2KAVarga(nextUchar) ) {
+                    listPhoneTypes.set(i, "CON");
+                    listPhoneSym.set(i, "ng~");
+                    utf8CharList.set(i, "0919");
+                    listConTypes.set(i, "U");
+                }
+            }
+            
+           // if (isFinalCharacter == true) {
+           //     break;
+           // }
+            
+            //System.err.println(prevType+" "+prevPhone+" "+prevUchar+" "+nextType+" "+nextPhone+" "+nextUchar);
+                
+            if ( (prevType.equals("CON") && nextType.equals("VOW")) ) {
+            	listConTypes.set(i, "F");
+            } else if (prevType.equals("VOW")) {
+            	listConTypes.set(i, "F");
+            }
+        }
+    }
+    
+    private void schwaHandler() {
+    	
+    	//printSchwaSequence();
+    	RuleSetZero();
+    	//printSchwaSequence();
+    	RuleSetOne();
+    	//printSchwaSequence();
+    	RuleSetTwo();
+    	//printSchwaSequence();
+    	RuleSetThree();
+    	//printSchwaSequence();
+    	RuleSetFour();
+    	//printSchwaSequence();
+    	RuleSetFive();
+    	//printSchwaSequence();
+    	RuleSetSix();
+    	//printSchwaSequence();
+    	RuleSetSeven();
+       	//printSchwaSequence();
+    	RuleSetEight();
+       	printSchwaSequence();
+       	
+       	FinalizeRules();
+    }
+    
+    private void FinalizeRules() {
+    	 String prevType, nextType;
+         String prevPhone, nextPhone;
+         String prevUchar, nextUchar;
+         String prevCon, nextCon;
+         boolean isFinalCharacter = false;
+         boolean encounterF = false;
+         
+         for(int i=0; i<listPhoneTypes.size(); i++){
+        	 prevType  = listPhoneTypes.get(i);
+             prevPhone = this.listPhoneSym.get(i);
+             prevUchar = this.utf8CharList.get(i);
+             prevCon = this.listConTypes.get(i);
+             
+             if ( (i+1) < listPhoneTypes.size() ) {
+                 nextType = listPhoneTypes.get(i+1);
+                 nextPhone = this.listPhoneSym.get(i+1);
+                 nextUchar = this.utf8CharList.get(i+1);
+                 nextCon = this.listConTypes.get(i+1);
+             } else {
+                 nextType = listPhoneTypes.get(i);
+                 nextPhone = this.listPhoneSym.get(i);
+                 nextUchar = this.utf8CharList.get(i);
+                 nextCon = this.listConTypes.get(i);
+                 isFinalCharacter = true;
+             }
+             
+             
+             if (isFinalCharacter == true) {
+                 break;
+             }
+             
+             if ("F".equals(prevCon) && "CON".equals(prevType)) {
+            	 if ( !"VOW".equals(nextType) || isFullVowel(nextUchar)) {
+            		 listPhoneTypes.add(i+1, "VOW");
+                     listPhoneSym.add(i+1, "a");
+                     this.utf8CharList.add(i+1,"093D");
+                     listConTypes.add(i+1, "#");
+            	 }
+             }
+         }
+ 	}
+    
+    private void RuleSetTwo() {
+    	 String prevType, nextType;
+         String prevPhone, nextPhone;
+         String prevUchar, nextUchar;
+         String prevCon, nextCon;
+         boolean isFinalCharacter = false;
+         
+         for(int i=0; i<listPhoneTypes.size(); i++){
+        	 prevType  = listPhoneTypes.get(i);
+             prevPhone = this.listPhoneSym.get(i);
+             prevUchar = this.utf8CharList.get(i);
+             prevCon = this.listConTypes.get(i);
+             
+             if ( (i+1) < listPhoneTypes.size() ) {
+                 nextType = listPhoneTypes.get(i+1);
+                 nextPhone = this.listPhoneSym.get(i+1);
+                 nextUchar = this.utf8CharList.get(i+1);
+                 nextCon = this.listConTypes.get(i+1);
+             } else {
+                 nextType = listPhoneTypes.get(i);
+                 nextPhone = this.listPhoneSym.get(i);
+                 nextUchar = this.utf8CharList.get(i);
+                 nextCon = this.listConTypes.get(i);
+                 isFinalCharacter = true;
+             }
+             
+             
+             if (isFinalCharacter == true) {
+                 break;
+             }
+             //printSchwaSequence();
+            
+             if ("y".equals(nextPhone)) {
+            	  if ("i".equals(prevPhone) || "ii".equals(prevPhone) || "u".equals(prevPhone) || "uu".equals(prevPhone) ){
+            		  listConTypes.set(i+1, "F");
+            	  } else if ("U".equals(prevCon)) {
+            		  listConTypes.set(i+1, "F");
+            	  }
+             }
+         }
+	}
+    
+    private void RuleSetThree() {
+   	 String prevType, nextType;
+        String prevPhone, nextPhone;
+        String prevUchar, nextUchar;
+        String prevCon, nextCon;
+        boolean isFinalCharacter = false;
+        
+        for(int i=0; i<listPhoneTypes.size(); i++){
+       	 prevType  = listPhoneTypes.get(i);
+            prevPhone = this.listPhoneSym.get(i);
+            prevUchar = this.utf8CharList.get(i);
+            prevCon = this.listConTypes.get(i);
+            
+            if ( (i+1) < listPhoneTypes.size() ) {
+                nextType = listPhoneTypes.get(i+1);
+                nextPhone = this.listPhoneSym.get(i+1);
+                nextUchar = this.utf8CharList.get(i+1);
+                nextCon = this.listConTypes.get(i+1);
+            } else {
+                nextType = listPhoneTypes.get(i);
+                nextPhone = this.listPhoneSym.get(i);
+                nextUchar = this.utf8CharList.get(i);
+                nextCon = this.listConTypes.get(i);
+                isFinalCharacter = true;
+            }
+            
+            
+            if (isFinalCharacter == true) {
+                break;
+            }
+            //printSchwaSequence();
+
+            if ("U".equals(nextCon)) {
+            	if ("y".equals(nextPhone) || "r".equals(nextPhone) || "l".equals(nextPhone) || "v".equals(nextPhone) ){
+            		if ("CON".equals(prevType) && "H".equals(prevCon) ) {
+            			listConTypes.set(i+1, "F"); 
+            		} else if ("HAL".equals(prevPhone)) {
+            			listConTypes.set(i+1, "F");  
+            		}
+
+            	}
+            }
+        }
+    }
+
+    private void RuleSetOne() {
+   	 String prevType, nextType;
+        String prevPhone, nextPhone;
+        String prevUchar, nextUchar;
+        String prevCon, nextCon;
+        boolean isFinalCharacter = false;
+        
+        for(int i=0; i<listPhoneTypes.size(); i++){
+       	 prevType  = listPhoneTypes.get(i);
+            prevPhone = this.listPhoneSym.get(i);
+            prevUchar = this.utf8CharList.get(i);
+            prevCon = this.listConTypes.get(i);
+            
+            if ( (i+1) < listPhoneTypes.size() ) {
+                nextType = listPhoneTypes.get(i+1);
+                nextPhone = this.listPhoneSym.get(i+1);
+                nextUchar = this.utf8CharList.get(i+1);
+                nextCon = this.listConTypes.get(i+1);
+            } else {
+                nextType = listPhoneTypes.get(i);
+                nextPhone = this.listPhoneSym.get(i);
+                nextUchar = this.utf8CharList.get(i);
+                nextCon = this.listConTypes.get(i);
+                isFinalCharacter = true;
+            }
+            
+            
+            if (isFinalCharacter == true) {
+                break;
+            }
+            //printSchwaSequence();
+            if ( ( "U".equals(prevCon) && prevType.equals("CON")) &&  nextType.equals("HLT") ) {
+           	 listConTypes.set(i, "H");
+            } 
+            //else if ( ("U".equals(prevCon) && isFullVowel(nextUchar)) ) {
+           	// listConTypes.set(i, "F");
+            //}
+        }
+	}
+
+    private void RuleSetFour() {
+      	 String prevType, nextType;
+           String prevPhone, nextPhone;
+           String prevUchar, nextUchar;
+           String prevCon, nextCon;
+           boolean isFinalCharacter = false;
+           
+           for(int i=0; i<listPhoneTypes.size(); i++){
+          	 prevType  = listPhoneTypes.get(i);
+               prevPhone = this.listPhoneSym.get(i);
+               prevUchar = this.utf8CharList.get(i);
+               prevCon = this.listConTypes.get(i);
+               
+               if ( (i+1) < listPhoneTypes.size() ) {
+                   nextType = listPhoneTypes.get(i+1);
+                   nextPhone = this.listPhoneSym.get(i+1);
+                   nextUchar = this.utf8CharList.get(i+1);
+                   nextCon = this.listConTypes.get(i+1);
+               } else {
+                   nextType = listPhoneTypes.get(i);
+                   nextPhone = this.listPhoneSym.get(i);
+                   nextUchar = this.utf8CharList.get(i);
+                   nextCon = this.listConTypes.get(i);
+                   isFinalCharacter = true;
+               }
+               
+               
+               if (isFinalCharacter == true) {
+                   break;
+               }
+               //printSchwaSequence();
+               if ( ("U".equals(prevCon) && isFullVowel(nextUchar)) ) {
+              	 listConTypes.set(i, "F");
+               }
+           }
+   	}
+    
+    private void RuleSetFive() {
+     	 String prevType, nextType;
+          String prevPhone, nextPhone;
+          String prevUchar, nextUchar;
+          String prevCon, nextCon;
+          boolean isFinalCharacter = false;
+          boolean encounterF = false;
+          
+          for(int i=0; i<listPhoneTypes.size(); i++){
+         	 prevType  = listPhoneTypes.get(i);
+              prevPhone = this.listPhoneSym.get(i);
+              prevUchar = this.utf8CharList.get(i);
+              prevCon = this.listConTypes.get(i);
+              
+              if ( (i+1) < listPhoneTypes.size() ) {
+                  nextType = listPhoneTypes.get(i+1);
+                  nextPhone = this.listPhoneSym.get(i+1);
+                  nextUchar = this.utf8CharList.get(i+1);
+                  nextCon = this.listConTypes.get(i+1);
+              } else {
+                  nextType = listPhoneTypes.get(i);
+                  nextPhone = this.listPhoneSym.get(i);
+                  nextUchar = this.utf8CharList.get(i);
+                  nextCon = this.listConTypes.get(i);
+                  isFinalCharacter = true;
+              }
+              
+              
+              if (isFinalCharacter == true) {
+                  break;
+              }
+              
+              if ("U".equals(prevCon) && !encounterF) {
+            	  listConTypes.set(i, "F");
+            	  break;
+              } else if ("F".equals(prevCon)) {
+            	  break;
+              }
+          }
+  	}
+    
+    private void RuleSetSix() {
+    	 String prevType, nextType;
+         String prevPhone, nextPhone;
+         String prevUchar, nextUchar;
+         String prevCon, nextCon;
+         boolean isFinalCharacter = false;
+         boolean encounterF = false;
+         int i = listPhoneTypes.size() - 1;
+         prevType  = listPhoneTypes.get(i);
+         prevPhone = this.listPhoneSym.get(i);
+         prevUchar = this.utf8CharList.get(i);
+         prevCon = this.listConTypes.get(i);
+         
+         if ( "U".equals(prevCon) && "CON".equals(prevType) ) {
+        	 listConTypes.set(i, "H");
+         }
+        
+ 	}
+    
+    
+    private void RuleSetSeven() {
+    	 String prevType, nextType;
+         String prevPhone, nextPhone;
+         String prevUchar, nextUchar;
+         String prevCon, nextCon;
+         boolean isFinalCharacter = false;
+         boolean encounterF = false;
+         
+         for(int i=0; i<listPhoneTypes.size(); i++){
+        	 prevType  = listPhoneTypes.get(i);
+             prevPhone = this.listPhoneSym.get(i);
+             prevUchar = this.utf8CharList.get(i);
+             prevCon = this.listConTypes.get(i);
+             
+             if ( (i+1) < listPhoneTypes.size() ) {
+                 nextType = listPhoneTypes.get(i+1);
+                 nextPhone = this.listPhoneSym.get(i+1);
+                 nextUchar = this.utf8CharList.get(i+1);
+                 nextCon = this.listConTypes.get(i+1);
+             } else {
+                 nextType = listPhoneTypes.get(i);
+                 nextPhone = this.listPhoneSym.get(i);
+                 nextUchar = this.utf8CharList.get(i);
+                 nextCon = this.listConTypes.get(i);
+                 isFinalCharacter = true;
+             }
+             
+             
+             if (isFinalCharacter == true) {
+                 break;
+             }
+             
+             if ("U".equals(prevCon) && "CON".equals(prevType)) {
+            	 if ("CON".equals(nextType) && "H".equals(nextCon)) {
+            		 listConTypes.set(i, "F");
+            	 } else if ("SYM".equals(nextType) && "#".equals(nextCon)) {
+            		 listConTypes.set(i, "F");
+            	 }
+             } 
+             
+         }
+ 	}
+    
+    private void RuleSetEight() {
+   	 	String prevType, nextType, currentType;
+        String prevPhone, nextPhone, currentPhone;
+        String prevUchar, nextUchar, currentUchar;
+        String prevCon, nextCon, currentCon;
+        boolean isFinalCharacter = false;
+        boolean encounterF = false;
+        
+        for(int i=1; i<listPhoneTypes.size()-1; i++){
+        	prevType  = listPhoneTypes.get(i-1);
+        	prevPhone = this.listPhoneSym.get(i-1);
+        	prevUchar = this.utf8CharList.get(i-1);
+        	prevCon = this.listConTypes.get(i-1);
+        	
+        	currentType  = listPhoneTypes.get(i);
+        	currentPhone = this.listPhoneSym.get(i);
+        	currentUchar = this.utf8CharList.get(i);
+        	currentCon = this.listConTypes.get(i);
+
+        	nextType = listPhoneTypes.get(i+1);
+        	nextPhone = this.listPhoneSym.get(i+1);
+        	nextUchar = this.utf8CharList.get(i+1);
+        	nextCon = this.listConTypes.get(i+1);
+
+
+            if (isFinalCharacter == true) {
+                break;
+            }
+            
+            if ( "U".equals(currentCon) ) {
+            	if ("F".equals(prevCon) && "F".equals(nextCon)) {
+            	 	listConTypes.set(i, "H");
+            	} else {
+            		listConTypes.set(i, "F");
+            	}
+            } 
+         }
+	}
+    
+    
+	/**
      * print array list 
      * @param aList
      */
@@ -623,7 +1084,21 @@ public class HindiLTS {
     private int hexString2Int (String hexCode) {
         return Integer.parseInt(hexCode, 16);  
     }
-    
+
+    private void printSchwaSequence() {
+    	if ( (this.listPhoneSym.size() != this.listConTypes.size()) 
+    			|| (this.listPhoneSym.size() != this.utf8CharList.size()) 
+    			|| (this.listPhoneSym.size() != this.listPhoneTypes.size()) ) {
+    		System.err.println(utf8CharList.size()+" "+listPhoneSym.size()
+    				+" "+listPhoneTypes.size()+ " "+listConTypes.size());
+    		throw new RuntimeException("Array list sizes doesnot match !!!");
+    	}
+    	System.out.println("***************");
+    	for ( int i=0; i<this.utf8CharList.size(); i++ ) {
+    		System.out.println(utf8CharList.get(i)+" "+listPhoneSym.get(i)
+    				+" "+listPhoneTypes.get(i)+ " "+listConTypes.get(i));
+    	}
+    }
     /**
      * @param args
      * @throws IOException 
@@ -639,7 +1114,12 @@ public class HindiLTS {
         //pw.flush();
         //pw.close();
         
-        System.out.println("Result : "+utf8r.phonemise("आपका"));
+       System.out.println("Result : "+utf8r.phonemise("आपका"));
+      System.out.println("Result : "+utf8r.phonemise("बचपन"));
+      System.out.println("Result : "+utf8r.phonemise("प्रियतम"));
+       System.out.println("Result : "+utf8r.phonemise("आमंत्रण"));
+      System.out.println("Result : "+utf8r.phonemise("कतई"));
+        
     }
 
 }
