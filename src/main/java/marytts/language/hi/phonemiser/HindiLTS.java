@@ -785,6 +785,9 @@ public class HindiLTS {
          boolean isFinalCharacter = false;
          boolean encounterF = false;
          int i = listPhoneTypes.size() - 1;
+         if (i < 0) return;
+         
+         
          prevType  = listPhoneTypes.get(i);
          prevPhone = this.listPhoneSym.get(i);
          prevUchar = this.utf8CharList.get(i);
