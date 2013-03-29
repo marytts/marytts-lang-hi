@@ -52,10 +52,21 @@ public class HindiLTS {
         this.loadPhoneSymbolsAndTypes(utf8toit3mapStream);
     }
   
+    public String phonemise(String line) throws IOException {
+    	
+    	String[] words = line.split("\\s+");
+    	String results = "";
+    	for ( int i=0; i<words.length; i++ ) {
+    		//System.out.println(words[i]+" --> "+this.phonemise(words[i].trim()));
+    		results += this.phonemiseWord(words[i].trim()) + " ";
+    	}
+    	
+    	return results.trim();
+    }
     
-    public String phonemise(String word) throws IOException
+    private String phonemiseWord(String word) throws IOException
     {
-    	word = word.trim();
+    	//word = word.trim();
         utf8CharList = readUTF8String(word);
         listPhoneSym = new ArrayList<String>();
         listPhoneTypes = new ArrayList<String>();
@@ -961,7 +972,7 @@ public class HindiLTS {
        System.out.println("Result : "+utf8r.phonemise("आमंत्रण"));
       System.out.println("Result : "+utf8r.phonemise("कतई"));
       System.out.println("Result : "+utf8r.phonemise("हूँ"));
-      utf8r.makeProperIt3("/Users/sathish/Work/BitBucket/delme/text/hin_0001.txt");
+      utf8r.makeProperIt3("/Users/sathish/Work/BitBucket/delme/text/hin_0004.txt");
         
     }
 
