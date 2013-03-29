@@ -30,6 +30,7 @@ import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Scanner;
 
 public class HindiLTS {
 
@@ -54,6 +55,7 @@ public class HindiLTS {
     
     public String phonemise(String word) throws IOException
     {
+    	word = word.trim();
         utf8CharList = readUTF8String(word);
         listPhoneSym = new ArrayList<String>();
         listPhoneTypes = new ArrayList<String>();
@@ -351,28 +353,15 @@ public class HindiLTS {
     
     public void makeProperIt3(String filename) throws IOException
     {
+        Scanner sc = new Scanner(new File(filename));
         
-    	utf8CharList = readUTF8File(filename);
-        listPhoneSym = new ArrayList<String>();
-        listPhoneTypes = new ArrayList<String>();
-         
-         Iterator<String> listrun = utf8CharList.iterator();
-         while(listrun.hasNext())
-         {
-             String utf8Char    = listrun.next();
-             String phoneSymbol = UTF8toPhoneSymbols.get(utf8Char);
-             String phoneType   = UTF8toPhoneTypes.get(utf8Char);
-             if(phoneSymbol == null) phoneSymbol = getAsciiChar(utf8Char);
-             if(phoneType == null) phoneType = "#";
-             listPhoneSym.add(phoneSymbol);
-             listPhoneTypes.add(phoneType);
-             System.out.println(utf8Char+" "+phoneSymbol+" "+phoneType);
-         }
-         
-         printArrayList(listPhoneSym);
-         printArrayList(listPhoneTypes);
-         schwaHandler();
-         printArrayList(listPhoneSym);
+        while (sc.hasNextLine()) {
+        	String line = sc.nextLine().trim();
+        	String[] words = line.split("\\s+");
+        	for ( int i=0; i<words.length; i++ ) {
+        		System.out.println(words[i]+" --> "+this.phonemise(words[i].trim()));
+        	}
+        }  
     }
     
  
@@ -971,6 +960,8 @@ public class HindiLTS {
       System.out.println("Result : "+utf8r.phonemise("प्रियतम"));
        System.out.println("Result : "+utf8r.phonemise("आमंत्रण"));
       System.out.println("Result : "+utf8r.phonemise("कतई"));
+      System.out.println("Result : "+utf8r.phonemise("हूँ"));
+      utf8r.makeProperIt3("/Users/sathish/Work/BitBucket/delme/text/hin_0001.txt");
         
     }
 
