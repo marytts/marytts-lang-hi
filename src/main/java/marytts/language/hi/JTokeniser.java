@@ -42,9 +42,9 @@ public class JTokeniser extends marytts.modules.JTokeniser {
                 new Locale("hi"));
     }
 
-	public MaryData process(MaryData d) throws Exception
+	/*public MaryData process(MaryData d) throws Exception
 	{
 		MaryData result = super.process(d);
 		return result;
-	}
+	}*/
 }

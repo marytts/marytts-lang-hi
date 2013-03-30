@@ -187,7 +187,7 @@ public class HindiLTS {
         StringBuilder result = new StringBuilder();
         while(listrun.hasNext())
         {
-            result.append(listrun.next());
+            result.append(" "+listrun.next());
         }
         return result.toString();
     }
